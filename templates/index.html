@@ -4,14 +4,21 @@
     <title>Main Page</title>
 {% endblock %}
 {% block body %}
+    {% for el in articles %}
     <div class="otstup">
     <div class="list-group list-group-vertical justify-content-center">
         <li class="list-group-item d-flex justify-content-between align-items-start element-list">
+            <p><a href={{ el.link }}><img src={{ el.link_image }} alt={{ el.link_image }} width="100" height="70" />
+            </a></p>
             <div class="ms-2 me-auto">
-                <div class="fw-bold">Subheading</div>
-                Cras justo odio
+                <div class="fw-bold">{{ el.name_music }}</div>
+                <h3>{{ el.fname }}  {{ el.sname }}</h3>
+                <h5>{{ el.mark }}</h5>
             </div>
         </li>
     </div>
     </div>
+    <br>
+    <br>
+    {% endfor %}
 {% endblock %}
