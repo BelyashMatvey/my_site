@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}
+    <title>Sign In Page</title>
+{% endblock %}
+{% block body %}
+    <div class="otstup1">
+    <form method="post">
+        <h1 class="h1 mb-3 fw-normal">Please sign in</h1><br>
+        <input type="text" name="fname" id="fname" class="form-control" placeholder="Name"><br>
+        <input type="text" name="sname" id="sname" class="form-control" placeholder="Surname"><br>
+        <input type="number" name="age" id="age" class="form-control" placeholder="Age"><br>
+        <input type="text" name="email" id="email" class="form-control" placeholder="E-Mail"><br>
+        <h3 class="h3 mb-3 fw-normal">Пароль должен содержать больше 6 символов!</h3><br>
+        <input type="text" name="password" id="password" class="form-control" placeholder="New password"><br>
+        <input type="text" name="rep_password" id="rep_password" class="form-control" placeholder="Repeat your password"><br>
+        <input type="submit" class="btn btn-primary btn-lg me-2 otstup-btn" value="Sign-up">
+    </form>
+    </div>
+        <br>
+{% endblock %}
