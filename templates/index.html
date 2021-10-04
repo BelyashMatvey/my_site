@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% block title %}
     <title>Main Page</title>
 {% endblock %}
@@ -8,12 +7,13 @@
     <div class="otstup">
     <div class="list-group list-group-vertical justify-content-center">
         <li class="list-group-item d-flex justify-content-between align-items-start element-list">
-            <p><a href={{ el.link }}><img src={{ el.link_image }} alt={{ el.link_image }} width="100" height="70" />
-            </a></p>
-            <div class="ms-2 me-auto">
-                <div class="fw-bold">{{ el.name_music }}</div>
-                <h3>{{ el.fname }}  {{ el.sname }}</h3>
-                <h5>{{ el.mark }}</h5>
+            <div class="container-sm1">
+                <h1>#1</h1>
+            </div>
+            <div class="container-sm">
+                <a href="composition.html"><h1>{{ el.name_music }}</h1></a>
+                <h5>Композитор: {{ el.cfname }}  {{ el.csname }}</h5>
+                <h5>Сложность: {{ el.cmark }}</h5>
             </div>
         </li>
     </div>
