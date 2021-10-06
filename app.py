@@ -86,12 +86,13 @@ def home():  # put application's code here
 @app.route('/composition/<string:name>')
 def composition(name):
     name_music = name
-    article = Article.query
+    article = Article.query.order_by(Article.cmark.desc()).all()
     r_article = 0
     for el in article:
         if el.name_music == name_music:
             r_article = el
-    return render_template('composition.html', comp=r_article)
+    print(r_article.a)
+    return render_template('composition.html', comp=r_article.a)
 
 
 @app.route('/login_page')
@@ -147,7 +148,7 @@ def create_article():
         age = request.form["age"]
         notes = request.form["notes"]
         article = Article(cfname=cfname, csname=csname, cmark=cmark, notes=notes, name_music=name_music)
-        column = Article.Columnes(sname=sname, fname=fname, link=link, link_image=link_image, age=age)
+        column = Article.Columnes(sname=sname, fname=fname, link=link, link_image=link_image, age=age, mark=mark)
         article.a.append(column)
         db.session.add(article)
         db.session.commit()
