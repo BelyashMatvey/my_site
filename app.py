@@ -87,12 +87,11 @@ def home():  # put application's code here
 def composition(name):
     name_music = name
     article = Article.query.order_by(Article.cmark.desc()).all()
-    r_article = 0
+    per = 0
     for el in article:
         if el.name_music == name_music:
-            r_article = el
-    print(r_article.a)
-    return render_template('composition.html', comp=r_article.a)
+            per = el
+    return render_template('composition.html', comp=per)
 
 
 @app.route('/login_page')
@@ -144,7 +143,7 @@ def create_article():
         sname = request.form["sname"]
         name_music = request.form["name_music"]
         link = request.form["link"]
-        link_image = "https://i.ytimg.com/vi/" + link[17:] + "/mqdefault.jpg"
+        link_image = "https://i.ytimg.com/vi/" + link[32:] + "/mqdefault.jpg"
         age = request.form["age"]
         notes = request.form["notes"]
         article = Article(cfname=cfname, csname=csname, cmark=cmark, notes=notes, name_music=name_music)
@@ -152,7 +151,6 @@ def create_article():
         article.a.append(column)
         db.session.add(article)
         db.session.commit()
-        print(link_image)
         return redirect('/home')
     else:
         return render_template('create-article.html')

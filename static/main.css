@@ -14,12 +14,17 @@
     margin-left: 327px;
 }
 .container-sm1{
-    padding-top: 23px;
     width: 100px;
     height: 70px;
 }
-A IMG{
-    border: none;
+.container-sm2{
+    padding-top: 0;
+    padding-left: 0;
+}
+body{
+    background-color: #ff0;
+    background-image: url(../templates/images/bg.jpg);
+    background-position: top;
 }
 .bd-placeholder-img {
         font-size: 1.125rem;

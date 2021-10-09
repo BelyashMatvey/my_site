@@ -1,13 +1,26 @@
 {% extends 'base.html' %}
 {% block body %}
-    <h1 style="margin-left: 200px">Топ:</h1>
-    {% for el in comp %}
+
+
+    <h1 style="text-align: center">{{ comp.name_music }}</h1>
+    <h2 style="text-align: center">Author: {{ comp.cfname }} {{ comp.csname}} , Verified by {{ comp.a[0].fname }} {{ comp.a[0].sname }}</h2>
+    <h2 style="text-align: center">Difficulty : {{ comp.cmark }}</h2>
+    <h2 style="margin-left: 300px">The link to sheets: <a href="{{ comp.notes }}" style="text-decoration: none;">Sheets</a></h2>
+
+    <h1 style="margin-left: 100px">The top:</h1>
+    {% for el in comp.a %}
     <div class="otstup">
          <div class="list-group list-group-vertical justify-content-center">
              <li class="list-group-item d-flex justify-content-between align-items-start element-list">
+                 <div class="container-sm2">
+                     <a href="{{ el.link }}">
+                         <img src="{{ el.link_image }}" alt="erhg" width="140px" height="90px">
+                     </a>
+                 </div>
                  <div class="container-sm">
-                    <h3>{{ el.fname }}  {{ el.sname }}</h3>
-                    <h3>{{ el.age }}</h3>
+                     <br>
+                    <h3>Исполнитель: {{ el.fname }}  {{ el.sname }}</h3>
+                    <h4>Возраст: {{ el.age }}</h4>
                  </div>
              </li>
          </div>
