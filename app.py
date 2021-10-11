@@ -43,6 +43,7 @@ class Article(db.Model):
         link_image = db.Column(db.String(100), nullable=False)
 
     a = list()
+    sorted(a, key=lambda column: column.mark)
 
     def __repr__(self):
         return '<Article %r>' % self.id
@@ -91,7 +92,30 @@ def composition(name):
     for el in article:
         if el.name_music == name_music:
             per = el
+    print(per.a)
     return render_template('composition.html', comp=per)
+
+
+@app.route('/create-col', methods=['POST', 'GET'])
+def create_col():
+    if request.method == 'POST':
+        fname = request.form["fname"]
+        sname = request.form["sname"]
+        age = request.form["age"]
+        mark = request.form["mark"]
+        name_music = request.form["name_music"]
+        link = request.form["link"]
+        link_image = "https://i.ytimg.com/vi/" + link[32:] + "/mqdefault.jpg"
+        article = Article.query.order_by(Article.cmark.desc()).all()
+        column = Article.Columnes(sname=sname, fname=fname, link=link, link_image=link_image, age=age, mark=mark)
+        for el in article:
+            if el.name_music == name_music:
+                el.a.append(column)
+                break
+        db.session.commit()
+        return redirect('/home')
+    else:
+        return render_template('column.html')
 
 
 @app.route('/login_page')
@@ -102,7 +126,7 @@ def login_page():
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('home'))
+    return redirect('/home')
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -112,8 +136,8 @@ def check_login():
         password = request.form["password"]
         sqlconnection = sqlite3.Connection("site.db")
         cursor = sqlconnection.cursor()
-        query1 = "SELECT email , password from User WHERE email='{email}' AND password='{password}'".format(email=email,
-                                                                                                            password=password)
+        query1 = "SELECT email , password from User WHERE email='{email}' AND password='{password}'".format(
+            email=email, password=password)
         rows = cursor.execute(query1)
         rows = rows.fetchall()
         if len(rows) == 1:
