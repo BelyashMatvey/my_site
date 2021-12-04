@@ -1,21 +1,27 @@
-import sqlite3
-
 from flask import Flask, render_template, request, redirect, flash, url_for
 from flask_login import LoginManager, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
-
+import psycopg2
 
 app = Flask(__name__)
 app.secret_key = '/=q3|40~$<l?6($!g$0|'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-app.config['SQLALCHEMY_DATABASE_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@localhost/site'
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 manager = LoginManager(app)
 
+sqlconnection = psycopg2.connect(
+    database="site",
+    user="postgres",
+    host="localhost",
+    password="password"
+)
+cursor = sqlconnection.cursor()
+
 
 class User(db.Model):
+    __tablename__ = 'Users'
     id = db.Column(db.Integer, autoincrement=True)
     fname = db.Column(db.String(50), primary_key=True, nullable=False)
     sname = db.Column(db.String(50), primary_key=True, nullable=False)
@@ -28,6 +34,7 @@ class User(db.Model):
 
 
 class Columnes(db.Model):
+    __tablename__ = 'columnes'
     id = db.Column(db.Integer, autoincrement=True)
     fname = db.Column(db.String(50), nullable=False)
     sname = db.Column(db.String(50), nullable=False)
@@ -42,14 +49,13 @@ class Columnes(db.Model):
 
 
 class Article(db.Model):
+    __tablename__ = 'Articles'
     id = db.Column(db.Integer, autoincrement=True)
     name_music = db.Column(db.String(100), primary_key=True, nullable=False)
     cfname = db.Column(db.String(50), nullable=False)
     csname = db.Column(db.String(50), nullable=False)
     notes = db.Column(db.String(100), nullable=False)
     cmark = db.Column(db.Float, nullable=False)
-    verif_fn = db.Column(db.String(50), nullable=False)
-    verif_sn = db.Column(db.String(50), nullable=False)
 
     def __repr__(self):
         return '<Article %r>' % self.id
@@ -86,18 +92,18 @@ def sign_up():
 
 @app.route('/home')
 def home():  # put application's code here
-    articles = Article.query.order_by(Article.cmark.desc()).all()
+    articles = "select cmark from Articles " \
+               "Order by cmark"
     return render_template('index.html', articles=articles)
 
 
 @app.route('/composition/<string:name>')
 def composition(name):
-    sqlconnection = sqlite3.connect("site.db", check_same_thread=False)
-    cursor = sqlconnection.cursor()
-    articule = [*cursor.execute("SELECT * from article where name_music=?", [name]).fetchall()]
-    columnes = [*cursor.execute("SELECT * from columnes where name_music=?", [name]).fetchall()]
-    print(articule[0][1])
-    return render_template('composition.html', comp=columnes, comp1=articule)
+    name_music = name
+    article = Article.query.order_by(Article.cmark.desc()).all()
+    query = "select * from db where article.name_music='{name_music}'".format(name_music=name)
+    print(query)
+    return render_template('composition.html', comp=query)
 
 
 @app.route('/create-col', methods=['POST', 'GET'])
@@ -110,9 +116,12 @@ def create_col():
         name_music = request.form["name_music"]
         link = request.form["link"]
         link_image = "https://i.ytimg.com/vi/" + link[32:] + "/mqdefault.jpg"
+        article = Article.query.order_by(Article.cmark.desc()).all()
         column = Columnes(sname=sname, fname=fname, link=link, link_image=link_image, age=age, mark=mark,
                           name_music=name_music)
-        db.session.add(column)
+        cursor.execute(
+            "UPDATE site set article.array.append('{column}') Where article.name_music='{name_music}'".format(
+                name_music=name_music, column=column))
         db.session.commit()
         return redirect('/home')
     else:
@@ -135,8 +144,6 @@ def check_login():
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
-        sqlconnection = sqlite3.Connection("site.db")
-        cursor = sqlconnection.cursor()
         query1 = "SELECT email , password from User WHERE email='{email}' AND password='{password}'".format(
             email=email, password=password)
         rows = cursor.execute(query1)
@@ -167,18 +174,21 @@ def create_article():
         fname = request.form["fname"]
         sname = request.form["sname"]
         name_music = request.form["name_music"]
-        verif_fn = request.form["fname"]
-        verif_sn = request.form["sname"]
         link = request.form["link"]
         link_image = "https://i.ytimg.com/vi/" + link[32:] + "/mqdefault.jpg"
         age = request.form["age"]
         notes = request.form["notes"]
-        article = Article(cfname=cfname, csname=csname, cmark=cmark, notes=notes, name_music=name_music,
-                          verif_fn=verif_fn, verif_sn=verif_sn)
+        article = Article(cfname=cfname, csname=csname, cmark=cmark, notes=notes, name_music=name_music)
         column = Columnes(sname=sname, fname=fname, link=link, link_image=link_image, age=age, mark=mark,
                           name_music=name_music)
-        db.session.add(article)
-        db.session.add(column)
+        query = '''INSERT into  ''' + "Article" + '''(name_music,cfname,csname,note,cmark) VALUES (%s,%s,%s,%s,%s)'''
+        data = (name_music, cfname, csname, notes, cmark)
+        cursor.execute(query, data)
+        query1 = "INSERT into Columnes values ('{fname}','{sname}','{mark}','{age}','{link}','{link_image}','{name_music}')".format(
+            fname=fname, sname=sname, mark=mark, age=age, link=link, link_image=link_image, name_music=name_music)
+        cursor.execute(query1)
+        #db.session.add(article)
+        #db.session.add(column)
         db.session.commit()
         return redirect('/home')
     else:
